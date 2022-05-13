@@ -11,8 +11,8 @@ module stupid_toy_loader (
 
 	always_comb
 		unique case (state)
-			IDLE: next_state = load_enable ? WRITE : IDLE;
-			WRITE: next_state = WRITE;
+			IDLE: next_state <= load_enable ? WRITE : IDLE;
+			WRITE: next_state <= WRITE;
 		endcase	
 
 	always @(posedge clk)

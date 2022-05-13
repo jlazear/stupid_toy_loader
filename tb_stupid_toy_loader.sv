@@ -17,6 +17,9 @@ logic [7:0] rdata;
 logic sreset, sload_enable;
 logic [7:0] sdata;
 
+logic nbsreset, nbsload_enable;
+logic [7:0] nbsdata;
+
 
 stupid_toy_loader dut (clk, reset, data, load_enable);
 stupid_toy_loader dutnb (nbclk, reset, data, load_enable);
@@ -25,7 +28,7 @@ stupid_toy_loader dutallnbbutclk (nbclk, nbreset, nbdata, nbload_enable);
 stupid_toy_loader dutrealistic (clk, rreset, rdata, rload_enable);
 stupid_toy_loader dutrealisticnb (nbclk, rreset, rdata, rload_enable);
 stupid_toy_loader dutsync (clk, sreset, sdata, sload_enable);
-stupid_toy_loader dutsyncnb (nbclk, sreset, sdata, sload_enable);
+stupid_toy_loader dutsyncnb (nbclk, nbsreset, nbsdata, nbsload_enable);
 
 
 
@@ -183,5 +186,47 @@ initial begin
 	$stop;
 end
 
+// synchronous signals
+initial begin
+	nbsreset <= '0;
+	nbsdata <= '0;
+	nbsload_enable <= '0;
+
+	#10;
+	@(posedge nbclk)
+	nbsreset <= 1;
+	#10;
+	@(posedge nbclk)
+	nbsreset <= 0;
+
+	#5;
+	@(posedge nbclk)
+	nbsdata <= 8'h3a;
+	#5;
+	@(posedge nbclk)
+	nbsload_enable <= 1;
+	#10;
+	@(posedge nbclk)
+	nbsdata <= 8'hff;
+
+	#20;
+	@(posedge nbclk)
+	nbsreset <= 1;
+	nbsload_enable <= 0;
+	nbsdata <= 8'h3a;
+	#15;
+	@(posedge nbclk)
+	nbsreset <= 0;
+	#10;
+	@(posedge nbclk)	
+	nbsload_enable <= 1;
+	
+	#10;
+	@(posedge nbclk)	
+	nbsdata <= 8'hff;
+
+	#20;
+	$stop;
+end
 
 endmodule : testbench
